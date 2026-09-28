@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { urlsRoute } from "./routes/urls";
+import { urlsRoute } from "./routes";
 
-const app = new Hono();
+export const app = new Hono();
 
 app.onError((err, c) => {
   console.error(err);

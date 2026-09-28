@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
 
-const createUrlSchema = z.object({
+export const createUrlSchema = z.object({
   url: z
     .url()
     .refine((v) => v.startsWith("http://") || v.startsWith("https://"), {
@@ -9,7 +9,7 @@ const createUrlSchema = z.object({
     }),
 });
 
-const codeParamSchema = z.object({
+export const codeParamSchema = z.object({
   code: z
     .string()
     .min(1)
@@ -22,7 +22,10 @@ export const createUrlValidator = zValidator(
   createUrlSchema,
   (r, c) => {
     if (!r.success)
-      return c.json({ error: r.error.issues[0]?.message ?? "Invalid request" });
+      return c.json(
+        { error: r.error.issues[0]?.message ?? "Invalid request" },
+        400,
+      );
   },
 );
 
