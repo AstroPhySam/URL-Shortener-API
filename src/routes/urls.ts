@@ -15,13 +15,6 @@ urlsRoute.post("/generate", createUrlValidator, async (c) => {
 
   for (let i = 0; i < 5; i++) {
     const shortCode = generateShortCode(6);
-    const [exists] = await db
-      .select({ id: urls.id })
-      .from(urls)
-      .where(eq(urls.shortCode, shortCode))
-      .limit(1);
-
-    if (exists) continue;
 
     try {
       [created] = await db
@@ -29,8 +22,10 @@ urlsRoute.post("/generate", createUrlValidator, async (c) => {
         .values({ originalUrl: normalized, shortCode })
         .returning();
       break;
-    } catch {
-      continue;
+    } catch (e: any) {
+      // 23505 = Postgres unique_violation on urls.short_code
+      if (e?.code === "23505" || e?.cause?.code === "23505") continue;
+      throw e;
     }
   }
 
